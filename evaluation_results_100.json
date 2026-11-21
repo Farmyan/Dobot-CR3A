@@ -1,0 +1,1795 @@
+{
+ "summary": {
+  "episodes": 100,
+  "mean_loc_err_mm": 0.8538837729399424,
+  "max_loc_err_mm": 3.756495318478877,
+  "grasp_success": 0.9170506912442397,
+  "pick_place_success": 0.9124423963133641,
+  "failure_stages": {
+   "grasp_plan": 18
+  },
+  "joint_limit_violations": 0,
+  "unsafe_contacts": 0
+ },
+ "episodes": [
+  {
+   "episode": 0,
+   "n_detected": 3,
+   "loc_err_mm": [
+    1.3683044653638108,
+    0.3882644839847045,
+    0.5696726827822295
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 10.779646873474121
+  },
+  {
+   "episode": 1,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.29517630971071157,
+    0.39262102304023705
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 73.38841032981873
+  },
+  {
+   "episode": 2,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.2878968296599557,
+    0.5679307417123977,
+    0.5166336856475964
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 33.71978712081909
+  },
+  {
+   "episode": 3,
+   "n_detected": 3,
+   "loc_err_mm": [
+    1.2893649078886427,
+    0.36303787744908644,
+    0.4877110689096155
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 3,
+   "placed": 2,
+   "failures": [
+    [
+     "grasp_plan",
+     "[grasp_plan] 9 candidates tried {'lift': 3, 'rrt': 4, 'place_plan': 1}; last: [lift] acceleration limit exceeded (3.93 rad/s^2)",
+     [
+      300,
+      70
+     ]
+    ]
+   ],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 101.01359152793884
+  },
+  {
+   "episode": 4,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.7218602638947451,
+    0.651528750931544,
+    0.18588981837896135
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 3,
+   "placed": 2,
+   "failures": [
+    [
+     "grasp_plan",
+     "[grasp_plan] 0 candidates tried {}; last: no collision-free IK solution for any grasp orientation",
+     [
+      235,
+      18
+     ]
+    ]
+   ],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 52.205116271972656
+  },
+  {
+   "episode": 5,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.3647939766092162,
+    0.6073282474303324,
+    0.3387559062986114
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 3,
+   "placed": 2,
+   "failures": [
+    [
+     "grasp_plan",
+     "[grasp_plan] 0 candidates tried {}; last: no collision-free IK solution for any grasp orientation",
+     [
+      233,
+      42
+     ]
+    ]
+   ],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 67.97655129432678
+  },
+  {
+   "episode": 6,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.710163770079067,
+    3.0605737308926786
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 6.54115104675293
+  },
+  {
+   "episode": 7,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.33062167936994374,
+    0.44777657914939495,
+    3.486359078797272
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 23.1125545501709
+  },
+  {
+   "episode": 8,
+   "n_detected": 3,
+   "loc_err_mm": [
+    2.5062033626389226,
+    0.5045596431654316,
+    3.756495318478877
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 9.612354516983032
+  },
+  {
+   "episode": 9,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.43017622234941205,
+    0.466222020393054
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 6.613923788070679
+  },
+  {
+   "episode": 10,
+   "n_detected": 3,
+   "loc_err_mm": [
+    1.8168263741146937,
+    0.4155956601538264,
+    0.4613235620135707
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 58.13365077972412
+  },
+  {
+   "episode": 11,
+   "n_detected": 1,
+   "loc_err_mm": [
+    0.458388279898772
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 3.895512104034424
+  },
+  {
+   "episode": 12,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.721305415194796,
+    0.4588458372064396
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 60.83154606819153
+  },
+  {
+   "episode": 13,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.4825986950735118,
+    0.43017754251226686,
+    0.49448846932993457
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 9.069222450256348
+  },
+  {
+   "episode": 14,
+   "n_detected": 1,
+   "loc_err_mm": [
+    0.3902545722034877
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 3.605440616607666
+  },
+  {
+   "episode": 15,
+   "n_detected": 3,
+   "loc_err_mm": [
+    1.0815841671604673,
+    0.47445525691389534,
+    0.4585210666724114
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 3,
+   "placed": 2,
+   "failures": [
+    [
+     "grasp_plan",
+     "[grasp_plan] 0 candidates tried {}; last: no collision-free IK solution for any grasp orientation",
+     [
+      223,
+      29
+     ]
+    ]
+   ],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 63.49237513542175
+  },
+  {
+   "episode": 16,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.5952277389566933,
+    1.9957984788116614
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 6.349854946136475
+  },
+  {
+   "episode": 17,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.4882336801596179,
+    0.4106456735492703,
+    2.583905667426298
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 3,
+   "placed": 2,
+   "failures": [
+    [
+     "grasp_plan",
+     "[grasp_plan] 0 candidates tried {}; last: no collision-free IK solution for any grasp orientation",
+     [
+      235,
+      34
+     ]
+    ]
+   ],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 82.21798038482666
+  },
+  {
+   "episode": 18,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.5929531822225267,
+    0.48592544562130363,
+    2.942168229417379
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 8.709071159362793
+  },
+  {
+   "episode": 19,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.5554261898182835,
+    0.6101889483067243
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 6.104620695114136
+  },
+  {
+   "episode": 20,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.7459514618010473,
+    0.20856154427881385,
+    0.48984125301351245
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 8.958618879318237
+  },
+  {
+   "episode": 21,
+   "n_detected": 1,
+   "loc_err_mm": [
+    1.2216198333029487
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 3.4387593269348145
+  },
+  {
+   "episode": 22,
+   "n_detected": 3,
+   "loc_err_mm": [
+    1.6312245508974317,
+    0.3074260324968143,
+    0.4835284851756992
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 45.06754493713379
+  },
+  {
+   "episode": 23,
+   "n_detected": 1,
+   "loc_err_mm": [
+    0.44774645105943195
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 3.686110019683838
+  },
+  {
+   "episode": 24,
+   "n_detected": 2,
+   "loc_err_mm": [
+    1.196882456160098,
+    0.4428132178345554
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 2,
+   "placed": 1,
+   "failures": [
+    [
+     "grasp_plan",
+     "[grasp_plan] 9 candidates tried {}; last: no approach IK near the grasp configuration",
+     [
+      240,
+      75
+     ]
+    ]
+   ],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 142.76078748703003
+  },
+  {
+   "episode": 25,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.3031882598065752,
+    0.4573873937156623
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 5.54756760597229
+  },
+  {
+   "episode": 26,
+   "n_detected": 3,
+   "loc_err_mm": [
+    1.4011653918689853,
+    0.462250148659513,
+    0.2981350803055114
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 83.58250093460083
+  },
+  {
+   "episode": 27,
+   "n_detected": 1,
+   "loc_err_mm": [
+    0.4862469662023762
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 2.8850018978118896
+  },
+  {
+   "episode": 28,
+   "n_detected": 2,
+   "loc_err_mm": [
+    1.5684012202708664,
+    0.871377143062906
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 5.4955573081970215
+  },
+  {
+   "episode": 29,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.5746099124921793,
+    0.3516376274003133,
+    0.343606311398358
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 7.42159104347229
+  },
+  {
+   "episode": 30,
+   "n_detected": 1,
+   "loc_err_mm": [
+    0.4117324330136435
+   ],
+   "grasp_ok": 0,
+   "picks_attempted": 1,
+   "placed": 0,
+   "failures": [
+    [
+     "grasp_plan",
+     "[grasp_plan] 7 candidates tried {'approach': 2, 'rrt': 5}; last: [rrt] no collision-free joint-space path found",
+     [
+      237,
+      192
+     ]
+    ]
+   ],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 159.31237983703613
+  },
+  {
+   "episode": 31,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.2744905719659643,
+    3.2592034243111208
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 17.186246156692505
+  },
+  {
+   "episode": 32,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.3513284909297745,
+    0.4697817478000357,
+    0.5908277922402915
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 459.9373219013214
+  },
+  {
+   "episode": 33,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.7946338921399335,
+    0.48187858495856606,
+    3.075329472694363
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 36.25668907165527
+  },
+  {
+   "episode": 34,
+   "n_detected": 1,
+   "loc_err_mm": [
+    3.201400510932921
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 2.220677137374878
+  },
+  {
+   "episode": 35,
+   "n_detected": 1,
+   "loc_err_mm": [
+    0.32430979246395775
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 2.091284990310669
+  },
+  {
+   "episode": 36,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.8104229872133768,
+    0.31098227697689956
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 3.821834087371826
+  },
+  {
+   "episode": 37,
+   "n_detected": 1,
+   "loc_err_mm": [
+    0.36243349258880525
+   ],
+   "grasp_ok": 0,
+   "picks_attempted": 1,
+   "placed": 0,
+   "failures": [
+    [
+     "grasp_plan",
+     "[grasp_plan] 9 candidates tried {}; last: no approach IK near the grasp configuration",
+     [
+      239,
+      67
+     ]
+    ]
+   ],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 70.07659912109375
+  },
+  {
+   "episode": 38,
+   "n_detected": 1,
+   "loc_err_mm": [
+    0.27065087426850476
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 2.388333797454834
+  },
+  {
+   "episode": 39,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.46655678619588464,
+    0.5564975935900482,
+    3.1505338314815803
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 124.97805285453796
+  },
+  {
+   "episode": 40,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.6011569420859045,
+    0.48121542755726465
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 83.31164455413818
+  },
+  {
+   "episode": 41,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.5878501496239062,
+    0.5062455392549676
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 16.652002811431885
+  },
+  {
+   "episode": 42,
+   "n_detected": 1,
+   "loc_err_mm": [
+    0.7486331451822356
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 9.492355585098267
+  },
+  {
+   "episode": 43,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.8957672600301559,
+    0.7696324181375188
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 2,
+   "placed": 1,
+   "failures": [
+    [
+     "grasp_plan",
+     "[grasp_plan] 9 candidates tried {'lift': 4, 'place_plan': 2, 'rrt': 2}; last: [lift] acceleration limit exceeded (4.02 rad/s^2)",
+     [
+      305,
+      -38
+     ]
+    ]
+   ],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 224.22929668426514
+  },
+  {
+   "episode": 44,
+   "n_detected": 3,
+   "loc_err_mm": [
+    1.5273436313250142,
+    1.5768599777832506,
+    0.528165509939076
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 3,
+   "placed": 2,
+   "failures": [
+    [
+     "grasp_plan",
+     "[grasp_plan] 0 candidates tried {}; last: no collision-free IK solution for any grasp orientation",
+     [
+      227,
+      -42
+     ]
+    ]
+   ],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 38.24868559837341
+  },
+  {
+   "episode": 45,
+   "n_detected": 3,
+   "loc_err_mm": [
+    1.1359954982053448,
+    0.43936492092789126,
+    0.5914481072297568
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 3,
+   "placed": 2,
+   "failures": [
+    [
+     "grasp_plan",
+     "[grasp_plan] 0 candidates tried {}; last: no collision-free IK solution for any grasp orientation",
+     [
+      240,
+      -13
+     ]
+    ]
+   ],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 38.16155195236206
+  },
+  {
+   "episode": 46,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.377795333207775,
+    0.2993673800931558
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 42.81862258911133
+  },
+  {
+   "episode": 47,
+   "n_detected": 1,
+   "loc_err_mm": [
+    0.5096097288248653
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 2.1073904037475586
+  },
+  {
+   "episode": 48,
+   "n_detected": 1,
+   "loc_err_mm": [
+    0.5261705529903326
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 2.072604179382324
+  },
+  {
+   "episode": 49,
+   "n_detected": 1,
+   "loc_err_mm": [
+    1.2432059390893428
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 32.903393030166626
+  },
+  {
+   "episode": 50,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.7256002658906289,
+    0.39474086061532776,
+    0.38431362752267706
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 3,
+   "placed": 2,
+   "failures": [
+    [
+     "grasp_plan",
+     "[grasp_plan] 9 candidates tried {'rrt': 5, 'ik_line': 3}; last: [rrt] no collision-free joint-space path found",
+     [
+      248,
+      59
+     ]
+    ]
+   ],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 72.02823519706726
+  },
+  {
+   "episode": 51,
+   "n_detected": 2,
+   "loc_err_mm": [
+    1.5475329784805614,
+    0.2943182296139488
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 4.090752124786377
+  },
+  {
+   "episode": 52,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.3237141817217493,
+    0.36346763250254727,
+    2.9137414943051874
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 5.679986238479614
+  },
+  {
+   "episode": 53,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.15976459436638052,
+    0.4595934841931737,
+    0.5652031955865328
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 20.10701632499695
+  },
+  {
+   "episode": 54,
+   "n_detected": 1,
+   "loc_err_mm": [
+    1.24407085879433
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 8.565957307815552
+  },
+  {
+   "episode": 55,
+   "n_detected": 3,
+   "loc_err_mm": [
+    1.362528686288496,
+    0.5114664130132198,
+    3.248134504580411
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 22.34805417060852
+  },
+  {
+   "episode": 56,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.421624838636069,
+    0.4610205237321476
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 15.765403032302856
+  },
+  {
+   "episode": 57,
+   "n_detected": 1,
+   "loc_err_mm": [
+    0.34275000890662793
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 9.201735258102417
+  },
+  {
+   "episode": 58,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.6324508846479858,
+    0.3499827216178544
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 16.142977476119995
+  },
+  {
+   "episode": 59,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.6501859558455688,
+    0.6694479501119155,
+    0.30799892541910356
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 288.06006836891174
+  },
+  {
+   "episode": 60,
+   "n_detected": 1,
+   "loc_err_mm": [
+    0.44877926732372925
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 8.811375856399536
+  },
+  {
+   "episode": 61,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.2817987871552598,
+    0.38941520999251367
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 51.724000453948975
+  },
+  {
+   "episode": 62,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.41788541831314713,
+    0.39511007088711936
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 16.94340419769287
+  },
+  {
+   "episode": 63,
+   "n_detected": 2,
+   "loc_err_mm": [
+    1.3182355021062149,
+    0.4017685200039883
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 2,
+   "placed": 1,
+   "failures": [
+    [
+     "grasp_plan",
+     "[grasp_plan] 0 candidates tried {}; last: no collision-free IK solution for any grasp orientation",
+     [
+      233,
+      -30
+     ]
+    ]
+   ],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 98.87571287155151
+  },
+  {
+   "episode": 64,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.5863442069370125,
+    0.5527110569510895
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 63.85741639137268
+  },
+  {
+   "episode": 65,
+   "n_detected": 1,
+   "loc_err_mm": [
+    1.1719752537766137
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 52.748332262039185
+  },
+  {
+   "episode": 66,
+   "n_detected": 3,
+   "loc_err_mm": [
+    1.3483366482055987,
+    0.3743038656738411,
+    0.47783273311899666
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 114.10888624191284
+  },
+  {
+   "episode": 67,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.3755888562653328,
+    0.3282576483633733,
+    3.2235381339550395
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 14.30673599243164
+  },
+  {
+   "episode": 68,
+   "n_detected": 2,
+   "loc_err_mm": [
+    1.8067412089755668,
+    0.3556519520903422
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 2,
+   "placed": 1,
+   "failures": [
+    [
+     "grasp_plan",
+     "[grasp_plan] 0 candidates tried {}; last: no collision-free IK solution for any grasp orientation",
+     [
+      223,
+      69
+     ]
+    ]
+   ],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 92.57313704490662
+  },
+  {
+   "episode": 69,
+   "n_detected": 1,
+   "loc_err_mm": [
+    3.363938692715272
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 5.58845591545105
+  },
+  {
+   "episode": 70,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.6051672221417752,
+    0.47231681152035626
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 9.57161569595337
+  },
+  {
+   "episode": 71,
+   "n_detected": 3,
+   "loc_err_mm": [
+    1.900892993648028,
+    0.7931770421677615,
+    0.14034913017617884
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 156.66844940185547
+  },
+  {
+   "episode": 72,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.9864482297317354,
+    0.4154019182196431,
+    2.8427483471052835
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 73.99847173690796
+  },
+  {
+   "episode": 73,
+   "n_detected": 3,
+   "loc_err_mm": [
+    1.058045440312868,
+    0.08502764796413206,
+    0.46482619875173653
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 10.747855186462402
+  },
+  {
+   "episode": 74,
+   "n_detected": 1,
+   "loc_err_mm": [
+    0.4671682990954541
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 4.064881086349487
+  },
+  {
+   "episode": 75,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.25273842523175344,
+    0.4208523990872021
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 49.16609811782837
+  },
+  {
+   "episode": 76,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.5680195500335687,
+    0.3850470612586833
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 10.908559560775757
+  },
+  {
+   "episode": 77,
+   "n_detected": 1,
+   "loc_err_mm": [
+    1.247214349667975
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 35.45035099983215
+  },
+  {
+   "episode": 78,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.39391162722595313,
+    2.182486548496089,
+    0.35096621515368603
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 3,
+   "placed": 2,
+   "failures": [
+    [
+     "grasp_plan",
+     "[grasp_plan] 9 candidates tried {'ik_line': 1, 'rrt': 7}; last: [rrt] no collision-free joint-space path found",
+     [
+      240,
+      87
+     ]
+    ]
+   ],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 122.86177444458008
+  },
+  {
+   "episode": 79,
+   "n_detected": 1,
+   "loc_err_mm": [
+    0.49999375595881
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 117.24722719192505
+  },
+  {
+   "episode": 80,
+   "n_detected": 3,
+   "loc_err_mm": [
+    1.294412108902287,
+    0.29719141236990604,
+    0.47095144566466207
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 127.5396785736084
+  },
+  {
+   "episode": 81,
+   "n_detected": 1,
+   "loc_err_mm": [
+    0.5417359070172433
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 6.357700347900391
+  },
+  {
+   "episode": 82,
+   "n_detected": 3,
+   "loc_err_mm": [
+    1.7128557156846693,
+    0.645974086336927,
+    0.29510362538315493
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 139.24514818191528
+  },
+  {
+   "episode": 83,
+   "n_detected": 3,
+   "loc_err_mm": [
+    1.367807552282209,
+    0.845376218062948,
+    0.44847120241629995
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 3,
+   "placed": 2,
+   "failures": [
+    [
+     "grasp_plan",
+     "[grasp_plan] 0 candidates tried {}; last: no collision-free IK solution for any grasp orientation",
+     [
+      222,
+      -35
+     ]
+    ]
+   ],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 77.37919306755066
+  },
+  {
+   "episode": 84,
+   "n_detected": 2,
+   "loc_err_mm": [
+    1.055633214424235,
+    0.5600717308389089
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 7.7047295570373535
+  },
+  {
+   "episode": 85,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.9342339994931878,
+    0.39429170259344215,
+    0.159104120035709
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 30.10657238960266
+  },
+  {
+   "episode": 86,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.7996001902136586,
+    0.5883078901727559,
+    0.3416924041918493
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 8.960843324661255
+  },
+  {
+   "episode": 87,
+   "n_detected": 2,
+   "loc_err_mm": [
+    1.0373195050306725,
+    0.543079361406423
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 2,
+   "placed": 1,
+   "failures": [
+    [
+     "grasp_plan",
+     "[grasp_plan] 9 candidates tried {}; last: no approach IK near the grasp configuration",
+     [
+      251,
+      -13
+     ]
+    ]
+   ],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 184.24012422561646
+  },
+  {
+   "episode": 88,
+   "n_detected": 2,
+   "loc_err_mm": [
+    1.0574593936770498,
+    0.42351201710636277
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 6.308429956436157
+  },
+  {
+   "episode": 89,
+   "n_detected": 3,
+   "loc_err_mm": [
+    1.0095444406438883,
+    1.444559974057643,
+    0.2906860750232388
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 3,
+   "placed": 2,
+   "failures": [
+    [
+     "grasp_plan",
+     "[grasp_plan] 0 candidates tried {}; last: no collision-free IK solution for any grasp orientation",
+     [
+      223,
+      3
+     ]
+    ]
+   ],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 33.29577994346619
+  },
+  {
+   "episode": 90,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.7835025317865312,
+    1.7169570924061566
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 2.431901454925537
+  },
+  {
+   "episode": 91,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.3236748296651061,
+    2.10908099976802,
+    3.0214629266584323
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 3.552199602127075
+  },
+  {
+   "episode": 92,
+   "n_detected": 2,
+   "loc_err_mm": [
+    1.6986288557388995,
+    0.45569226327898876
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 42.11412501335144
+  },
+  {
+   "episode": 93,
+   "n_detected": 3,
+   "loc_err_mm": [
+    1.4284866377054084,
+    0.7589771252524595,
+    0.47815819826882305
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 94.23197889328003
+  },
+  {
+   "episode": 94,
+   "n_detected": 1,
+   "loc_err_mm": [
+    0.7915257591933466
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 59.14161801338196
+  },
+  {
+   "episode": 95,
+   "n_detected": 2,
+   "loc_err_mm": [
+    0.48577042622504163,
+    0.4567661445029217
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 8.2655029296875
+  },
+  {
+   "episode": 96,
+   "n_detected": 3,
+   "loc_err_mm": [
+    0.4404737656967246,
+    0.6485523889200837,
+    0.40345797501546354
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 141.09661316871643
+  },
+  {
+   "episode": 97,
+   "n_detected": 1,
+   "loc_err_mm": [
+    0.4770565994011186
+   ],
+   "grasp_ok": 1,
+   "picks_attempted": 1,
+   "placed": 1,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 5.080706596374512
+  },
+  {
+   "episode": 98,
+   "n_detected": 2,
+   "loc_err_mm": [
+    3.1457263187875784,
+    0.46381865027010394
+   ],
+   "grasp_ok": 2,
+   "picks_attempted": 2,
+   "placed": 2,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 17.347965955734253
+  },
+  {
+   "episode": 99,
+   "n_detected": 3,
+   "loc_err_mm": [
+    1.4480400169764422,
+    0.3468995507056488,
+    1.0632459803624028
+   ],
+   "grasp_ok": 3,
+   "picks_attempted": 3,
+   "placed": 3,
+   "failures": [],
+   "joint_violations": 0,
+   "unsafe_contacts": 0,
+   "unsafe_pairs": {},
+   "seconds": 124.92206120491028
+  }
+ ]
+}

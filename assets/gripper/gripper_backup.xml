@@ -1,0 +1,119 @@
+
+<body name="bracket">
+
+    <!-- Compact mounting plate -->
+    <geom name="hc95_mount"
+          type="box"
+          pos="0 0 0"
+          size="0.040 0.0275 0.005"
+          rgba="0.20 0.20 0.23 1"
+          mass="0.15"/>
+
+    <!-- HC95 gripper body -->
+    <body name="gripper"
+          pos="0 0.003 0.007"
+          quat="0.707388 0.706825 0 0">
+
+        <!-- Central elongated housing -->
+        <geom name="hc95_housing"
+              type="ellipsoid"
+              pos="0 0.025 0"
+              size="0.023 0.043 0.015"
+              rgba="0.12 0.12 0.14 1"
+              mass="0.8"/>
+
+        <!-- Lower central housing -->
+        <geom name="hc95_lower"
+              type="box"
+              pos="0 0.002 0"
+              size="0.018 0.018 0.013"
+              rgba="0.10 0.10 0.12 1"
+              mass="0.08"/>
+
+        <!-- Front central cover -->
+        <geom name="hc95_cover"
+              type="box"
+              pos="0 0.027 0.015"
+              size="0.014 0.028 0.003"
+              rgba="0.20 0.20 0.22 1"
+              mass="0.03"/>
+
+        <!-- Crossed mechanical linkage arms -->
+        <geom name="link_left_outer"
+              type="capsule"
+              fromto="-0.012 0.005 0.012  -0.048 0.065 0.012"
+              size="0.004"
+              rgba="0.12 0.12 0.14 1"/>
+
+        <geom name="link_right_outer"
+              type="capsule"
+              fromto="0.012 0.005 0.012  0.048 0.065 0.012"
+              size="0.004"
+              rgba="0.12 0.12 0.14 1"/>
+
+        <geom name="link_left_cross"
+              type="capsule"
+              fromto="-0.012 0.025 0.016  0.045 0.055 0.016"
+              size="0.003"
+              rgba="0.30 0.30 0.33 1"/>
+
+        <geom name="link_right_cross"
+              type="capsule"
+              fromto="0.012 0.025 0.016  -0.045 0.055 0.016"
+              size="0.003"
+              rgba="0.30 0.30 0.33 1"/>
+
+        <!-- Outer arm joints / pivots -->
+        <geom name="pivot_left"
+              type="cylinder"
+              pos="-0.014 0.018 0.018"
+              size="0.006 0.003"
+              rgba="0.55 0.55 0.58 1"/>
+
+        <geom name="pivot_right"
+              type="cylinder"
+              pos="0.014 0.018 0.018"
+              size="0.006 0.003"
+              rgba="0.55 0.55 0.58 1"/>
+
+        <!-- Left gripping finger -->
+        <body name="picker_1" pos="0.05 0.065 0">
+
+            <joint name="picker_1_joint"
+                   type="slide"
+                   axis="-1 0 0"
+                   range="0 0.045"
+                   damping="5"
+                   frictionloss="0.5"/>
+
+            <geom name="picker_1_geom"
+                  type="box"
+                  pos="0 0.018 0"
+                  size="0.004 0.025 0.006"
+                  rgba="0.68 0.68 0.71 1"
+                  mass="0.1"/>
+        </body>
+
+        <!-- Right gripping finger -->
+        <body name="picker_2" pos="-0.05 0.065 0">
+
+            <joint name="picker_2_joint"
+                   type="slide"
+                   axis="1 0 0"
+                   range="0 0.045"
+                   damping="5"
+                   frictionloss="0.5"/>
+
+            <geom name="picker_2_geom"
+                  type="box"
+                  pos="0 0.018 0"
+                  size="0.004 0.025 0.006"
+                  rgba="0.68 0.68 0.71 1"
+                  mass="0.1"/>
+        </body>
+
+        <!-- Tool center point -->
+        <site name="tcp" pos="0 0.085 0" size="0.004"/>
+
+    </body>
+</body>

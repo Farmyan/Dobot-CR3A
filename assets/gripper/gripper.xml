@@ -1,0 +1,67 @@
+<mujoco model="ag95_gripper">
+    <asset>
+        <mesh name="ag95_base" file="ag95_base_link.STL" scale="0.001 0.001 0.001"/>
+<mesh name="ag95_crank" file="ag95_crank_Link.STL" scale="0.001 0.001 0.001"/>
+<mesh name="ag95_rod" file="ag95_rod_Link.STL" scale="0.001 0.001 0.001"/>
+<mesh name="ag95_prox" file="ag95_proximal_phalanx_Link.STL" scale="0.001 0.001 0.001"/>
+<mesh name="ag95_distal" file="ag95_distal_phalanx_Link.STL" scale="0.001 0.001 0.001"/>
+    </asset>
+    <worldbody>
+        <body name="ag95" pos="0 0 0" quat="-0.034867472 0.005908273 -0.022372414 0.999124029">
+    <inertial pos="0 0 0" mass="0.83416" fullinertia="0.0013016 0.00049972 0.001498 -6.9374e-07 5.9848e-07 2.0244e-07"/>
+<geom type="mesh" mesh="ag95_base" rgba="0.10 0.10 0.11 1" contype="2" conaffinity="1" friction="1.5 0.01 0.001"/>
+    
+    <body name="ag95_finger1_knuckle" pos="-0.016 0 0.10586" quat="0.000796327 0.000000000 0.000000000 0.999999683">
+        <joint name="ag95_finger1_joint" type="hinge" axis="0 -1 0" range="0 0.6524" damping="0.020" armature="5e-5"/>
+        <inertial pos="0 0 0" mass="0.011111" fullinertia="3.88172e-06 1.92174e-06 4.32374e-06 -2.29456e-13 8.33e-07 2.04435e-13"/>
+    <geom type="mesh" mesh="ag95_crank" rgba="0.30 0.30 0.33 1" contype="0" conaffinity="0"/>
+        <body name="ag95_finger1_finger" pos="0.0292080077784 0 -0.0227132622407">
+            <joint name="ag95_finger1_finger_joint" type="hinge" axis="0 -1 0" damping="0.020" armature="5e-5"/>
+            <inertial pos="0 0 0" mass="0.0222871" fullinertia="8.72836e-06 7.26157e-06 3.3425e-06 7.0843e-15 -2.18833e-06 7.6579e-15"/>
+    <geom type="mesh" mesh="ag95_rod" rgba="0.30 0.30 0.33 1" contype="0" conaffinity="0"/>
+        </body>
+    </body>
+    <body name="ag95_finger1_inner" pos="-0.016 0 0.10586" quat="0.000796327 0.000000000 0.000000000 0.999999683">
+        <joint name="ag95_finger1_inner_joint" type="hinge" axis="0 -1 0" damping="0.020" armature="5e-5"/>
+        <inertial pos="0 0 0" mass="0.0318004" fullinertia="1.39848e-05 1.04943e-05 1.36183e-05 -9.54763e-15 -5.01422e-06 8.94585e-16"/>
+    <geom type="mesh" mesh="ag95_prox" rgba="0.22 0.22 0.25 1" contype="0" conaffinity="0"/>
+        <body name="ag95_finger1_tip" pos="0.0394969463769 0 0.0382752038125">
+            <joint name="ag95_finger1_tip_joint" type="hinge" axis="0 1 0" damping="0.020" armature="5e-5"/>
+            <inertial pos="0 0 0" mass="0.0124305" fullinertia="2.84217e-06 3.03961e-06 1.11815e-06 -2.48048e-15 8.24539e-07 2.16427e-13"/>
+    <geom type="mesh" mesh="ag95_distal" rgba="0.08 0.08 0.09 1" contype="2" conaffinity="1" friction="1.5 0.01 0.001"/>
+        </body>
+    </body>
+    
+    <body name="ag95_finger2_knuckle" pos="0.016 0 0.10586" quat="1 0 0 0">
+        <joint name="ag95_finger2_joint" type="hinge" axis="0 -1 0" damping="0.020" armature="5e-5"/>
+        <inertial pos="0 0 0" mass="0.011111" fullinertia="3.88172e-06 1.92174e-06 4.32374e-06 -2.29456e-13 8.33e-07 2.04435e-13"/>
+    <geom type="mesh" mesh="ag95_crank" rgba="0.30 0.30 0.33 1" contype="0" conaffinity="0"/>
+        <body name="ag95_finger2_finger" pos="0.0292080077784 0 -0.0227132622407">
+            <joint name="ag95_finger2_finger_joint" type="hinge" axis="0 -1 0" damping="0.020" armature="5e-5"/>
+            <inertial pos="0 0 0" mass="0.0222871" fullinertia="8.72836e-06 7.26157e-06 3.3425e-06 7.0843e-15 -2.18833e-06 7.6579e-15"/>
+    <geom type="mesh" mesh="ag95_rod" rgba="0.30 0.30 0.33 1" contype="0" conaffinity="0"/>
+        </body>
+    </body>
+    <body name="ag95_finger2_inner" pos="0.016 0 0.10586" quat="1 0 0 0">
+        <joint name="ag95_finger2_inner_joint" type="hinge" axis="0 -1 0" damping="0.020" armature="5e-5"/>
+        <inertial pos="0 0 0" mass="0.0318004" fullinertia="1.39848e-05 1.04943e-05 1.36183e-05 -9.54763e-15 -5.01422e-06 8.94585e-16"/>
+    <geom type="mesh" mesh="ag95_prox" rgba="0.22 0.22 0.25 1" contype="0" conaffinity="0"/>
+        <body name="ag95_finger2_tip" pos="0.0394969463769 0 0.0382752038125">
+            <joint name="ag95_finger2_tip_joint" type="hinge" axis="0 1 0" damping="0.020" armature="5e-5"/>
+            <inertial pos="0 0 0" mass="0.0124305" fullinertia="2.84217e-06 3.03961e-06 1.11815e-06 -2.48048e-15 8.24539e-07 2.16427e-13"/>
+    <geom type="mesh" mesh="ag95_distal" rgba="0.08 0.08 0.09 1" contype="2" conaffinity="1" friction="1.5 0.01 0.001"/>
+        </body>
+    </body>
+<site name="tcp" pos="0 0 0.16" size="0.004" rgba="1 0 0 1"/>
+</body>
+    </worldbody>
+    <equality>
+        <joint joint1="ag95_finger2_joint" joint2="ag95_finger1_joint" polycoef="0 1.0 0 0 0" solref="0.005 1"/>
+<joint joint1="ag95_finger1_finger_joint" joint2="ag95_finger1_joint" polycoef="0 0.4563942 0 0 0" solref="0.005 1"/>
+<joint joint1="ag95_finger2_finger_joint" joint2="ag95_finger1_joint" polycoef="0 0.4563942 0 0 0" solref="0.005 1"/>
+<joint joint1="ag95_finger1_inner_joint" joint2="ag95_finger1_joint" polycoef="0 1.49462955 0 0 0" solref="0.005 1"/>
+<joint joint1="ag95_finger2_inner_joint" joint2="ag95_finger1_joint" polycoef="0 1.49462955 0 0 0" solref="0.005 1"/>
+<joint joint1="ag95_finger1_tip_joint" joint2="ag95_finger1_joint" polycoef="0 1.49462955 0 0 0" solref="0.005 1"/>
+<joint joint1="ag95_finger2_tip_joint" joint2="ag95_finger1_joint" polycoef="0 1.49462955 0 0 0" solref="0.005 1"/>
+    </equality>
+</mujoco>

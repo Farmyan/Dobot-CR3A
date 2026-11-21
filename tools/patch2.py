@@ -1,0 +1,10 @@
+﻿from pathlib import Path
+p = Path("simulation/environment.py")
+s = p.read_text(encoding="utf-8")
+s = s.replace("for a in self.grip_q) + 0.004)", "for a in self.grip_q) - 0.004)")
+p.write_text(s, encoding="utf-8")
+q = Path("deployment/simulation_interface.py")
+t = q.read_text(encoding="utf-8")
+t = t.replace("(width - 0.004) / 2", "(width + 0.004) / 2")
+q.write_text(t, encoding="utf-8")
+print("environment fixed:", "- 0.004)" in s, " interface fixed:", "(width + 0.004) / 2" in t)
