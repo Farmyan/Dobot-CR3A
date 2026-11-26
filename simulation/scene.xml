@@ -2,7 +2,7 @@
   <compiler angle="radian" meshdir="../assets/meshes" autolimits="true"/>
   <option timestep="0.002" gravity="0 0 -9.81" integrator="implicitfast" cone="elliptic" impratio="10"/>
   <visual><global offwidth="1280" offheight="960"/></visual>
-  <statistic center="0.3 0 0.2" extent="1.0"/>
+  <statistic center="0 0 0.2" extent="1.7"/>
 
   <include file="robot.xml"/>
 
@@ -10,9 +10,9 @@
     <light pos="0.35 0 1.6" dir="0 0 -1" diffuse="0.95 0.95 0.95" specular="0 0 0"/>
     <light pos="1.0 0.8 1.2" dir="-1 -1 -1" diffuse="0.35 0.35 0.35" specular="0 0 0"/>
     <geom name="floor" type="plane" size="2 2 0.1" pos="0 0 -0.04" rgba="0.30 0.30 0.33 1"/>
-    <geom name="table_geom" type="box" size="0.65 0.65 0.02" pos="0.3 0 -0.02" rgba="0.82 0.82 0.80 1"
+    <geom name="table_geom" type="box" size="0.80 0.25 0.02" pos="0 0 -0.02" rgba="0.82 0.82 0.80 1"
           friction="1 0.005 0.0001"/>
-    <camera name="vx500_cam" pos="0.36 0 0.92" fovy="54" resolution="1280 960"/>
+    <camera name="vx500_cam" pos="0 0 1.30" fovy="54" resolution="1280 960"/>
 
     <!-- Randomly movable colored floor target pads (120x120 mm, mocap bodies, no collision) -->
     <body name="zone_red" mocap="true" pos="6.0 6.0 -0.05">
@@ -50,3 +50,4 @@
     <body name="cube_15" pos="20 5.0 0.0125"><freejoint name="cube_15_free"/><geom name="cube_15_geom" type="box" size="0.0125 0.0125 0.0125" mass="0.012" condim="4" friction="1.2 0.005 0.0001" solref="0.025 1" solimp="0.7 0.9 0.003" rgba="0.95 0.10 0.10 1"/></body>
   </worldbody>
 </mujoco>
+

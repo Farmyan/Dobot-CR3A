@@ -36,8 +36,9 @@ class WorkspaceConfig:
     cube_size: float = 0.025               # 25 mm sponge cube
     zone_half_size: float = 0.060          # 120 x 120 mm colored floor pad (fits 4 cubes with 39 mm gap)
     # Sweet-spot top-down reachability window (never too close to base or too far)
-    spawn_x: tuple = (0.20, 0.60)
-    spawn_y: tuple = (-0.50, 0.50)
+    # Reachable cube-spawning region in the left table section.
+    spawn_x: tuple = (-0.475, -0.325)
+    spawn_y: tuple = (-0.225, 0.225)
     min_r: float = 0.32
     max_r: float = 0.48
     min_cube_spacing: float = 0.068        # > 55 mm open gripper width so fingers never clip neighbors
@@ -49,7 +50,7 @@ class WorkspaceConfig:
     tcp_to_cube_center_z: float = 0.030
     approach_height: float = 0.08
     lift_height: float = 0.10
-    tcp_box: tuple = (-0.1, 0.6, -0.55, 0.55, 0.005, 0.55)
+    tcp_box: tuple = (-0.55, 0.6, -0.55, 0.55, 0.005, 0.55)
     link_min_z: float = 0.02
 
 
@@ -76,6 +77,8 @@ ROBOT = RobotConfig()
 WORKSPACE = WorkspaceConfig()
 CAMERA = CameraConfig()
 GRIPPER = GripperConfig()
+
+
 
 
 

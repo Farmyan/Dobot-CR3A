@@ -87,9 +87,9 @@ def rrt_connect(q0, q1, valid, lower, upper, rng, max_iter=800, step=0.4, res=0.
     swapped = False
 
     def extend(tree, par, q):
-        i = int(np.argmin(np.linalg.norm(np.array(tree) - q, axis=1)))
+        i = int(np.argmin(np.sum(np.abs(np.array(tree) - q), axis=1)))
         d = q - tree[i]
-        dist = float(np.linalg.norm(d))
+        dist = float(np.sum(np.abs(d)))
         if dist < 1e-9:
             return i
         qn = q if dist <= step else tree[i] + d / dist * step
@@ -123,15 +123,58 @@ def rrt_connect(q0, q1, valid, lower, upper, rng, max_iter=800, step=0.4, res=0.
     return None
 
 
-def shortcut(path, valid, rng, iters=80, res=0.05):
+def shortcut(path, valid, rng=None, iters=80, res=0.05):
+    """Find a short collision-free route through the original RRT waypoints."""
     path = list(path)
-    for _ in range(iters):
-        if len(path) < 3:
-            break
-        i, j = sorted(rng.choice(len(path), 2, replace=False))
-        if j - i >= 2 and _edge_ok(path[i], path[j], valid, res):
-            path = path[: i + 1] + path[j:]
-    return path
+    n = len(path)
+    if n < 3:
+        return path
+
+    # Avoid an expensive quadratic search on unusually large RRT trees.
+    # The fallback preserves the previous greedy behavior.
+    if n > 30:
+        simplified = [path[0]]
+        i = 0
+        while i < n - 1:
+            chosen = i + 1
+            for j in range(n - 1, i + 1, -1):
+                if _edge_ok(path[i], path[j], valid, res):
+                    chosen = j
+                    break
+            simplified.append(path[chosen])
+            i = chosen
+        return simplified
+
+    # Shortest-path search on a directed acyclic graph:
+    # each original waypoint is a node, and a collision-free
+    # shortcut from i to j is an edge when i < j.
+    costs = np.full(n, np.inf)
+    parents = np.full(n, -1, dtype=int)
+    costs[0] = 0.0
+
+    for j in range(1, n):
+        for i in range(j):
+            if not np.isfinite(costs[i]):
+                continue
+            if not _edge_ok(path[i], path[j], valid, res):
+                continue
+
+            candidate = costs[i] + float(np.sum(np.abs(path[j] - path[i])))
+            if candidate < costs[j]:
+                costs[j] = candidate
+                parents[j] = i
+
+    # The original RRT edges should remain available as a fallback.
+    if parents[-1] < 0:
+        return path
+
+    indices = []
+    i = n - 1
+    while i != -1:
+        indices.append(i)
+        i = parents[i]
+
+    return [path[i] for i in reversed(indices)]
 
 
 def plan_waypoints(wps, vmax, amax, dt=0.01):
@@ -149,8 +192,69 @@ def plan_waypoints(wps, vmax, amax, dt=0.01):
 def plan_joint_rrt(q0, q1, valid, lower, upper, vmax, amax, dt=0.01, seed=0, max_iter=800):
     if not valid(np.asarray(q1, float)):
         raise PlanningError("rrt", "goal configuration is not valid")
-    rng = np.random.default_rng(seed)
-    path = rrt_connect(q0, q1, valid, lower, upper, rng, max_iter=max_iter)
-    if path is None:
+
+    best_path = None
+    best_simplified = None
+    best_cost = np.inf
+    successful = 0
+
+    attempts = 2
+    for attempt in range(attempts):
+        rng = np.random.default_rng(seed + attempt)
+        path = rrt_connect(
+            q0, q1, valid, lower, upper, rng,
+            max_iter=max_iter,
+        )
+        if path is None:
+            continue
+
+        successful += 1
+        simplified_candidate = shortcut(path, valid, rng)
+        cost = sum(
+            float(np.sum(np.abs(b - a)))
+            for a, b in zip(simplified_candidate[:-1], simplified_candidate[1:])
+        )
+
+        if cost < best_cost:
+            best_cost = cost
+            best_path = path
+            best_simplified = simplified_candidate
+
+    if best_simplified is None:
         raise PlanningError("rrt", "no collision-free joint-space path found")
-    return plan_waypoints(shortcut(path, valid, rng), vmax, amax, dt)
+
+    path = best_path
+    simplified = best_simplified
+    print(
+        f"[RRT MULTI] successful={successful}/{attempts} "
+        f"best_L1_cost={best_cost:.3f} rad",
+        flush=True,
+    )
+
+    waypoint_degrees = [
+        np.round(np.rad2deg(q), 1).tolist()
+        for q in simplified
+    ]
+    print(
+        "[RRT WAYPOINTS] "
+        + " -> ".join(str(q) for q in waypoint_degrees),
+        flush=True,
+    )
+
+    original_length = sum(
+        float(np.linalg.norm(b - a))
+        for a, b in zip(path[:-1], path[1:])
+    )
+    simplified_length = sum(
+        float(np.linalg.norm(b - a))
+        for a, b in zip(simplified[:-1], simplified[1:])
+    )
+
+    print(
+        f"[RRT SIMPLIFY] nodes={len(path)} -> {len(simplified)} | "
+        f"joint_path_length={original_length:.3f} -> "
+        f"{simplified_length:.3f}",
+        flush=True,
+    )
+
+    return plan_waypoints(simplified, vmax, amax, dt)

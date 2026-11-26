@@ -1,4 +1,4 @@
-﻿"""Entry point.
+"""Entry point.
   python main.py --mode sim --episodes 100
   python main.py --mode sim --viewer          (opens browser control panel + MuJoCo 3D viewer)
   python main.py --mode real                  (supervised; see README deployment checklist)"""
@@ -122,26 +122,14 @@ def _start_browser_ui(state, robot):
     return server
 
 
-def run_interactive_viewer(env, pnp, sol_q):
-    import mujoco.viewer
-
-    state = {"regenerate": True, "clear": False, "status": "Initializing..."}
+def run_interactive_viewer(env, pnp, sol_q, vw, state):
     server = _start_browser_ui(state, pnp.robot)
-
-    def key_callback(keycode):
-        if keycode == ord("R"):
-            state["regenerate"] = True
-            pnp.robot.abort_requested = True
-        elif keycode == ord("C"):
-            state["clear"] = True
-            pnp.robot.abort_requested = True
-
-    vw = mujoco.viewer.launch_passive(env.model, env.data, key_callback=key_callback)
     pnp.robot.viewer = vw
 
     # Track exact occupied sub-slots per color so cubes NEVER stack on top of each other
     placed_slots_by_color = {}
     failed_keys = set()
+    last_diag_time = 0.0
 
     try:
         while vw.is_running():
@@ -171,6 +159,18 @@ def run_interactive_viewer(env, pnp, sol_q):
             vw.sync()
             dets, zones = pnp.detect_scene()
 
+            if not hasattr(state, "_first_detection_logged"):
+                from collections import Counter
+                state["_first_detection_logged"] = True
+                print("\\n[FIRST LIVE DETECTION]", flush=True)
+                print(f"  Cubes: {len(dets)} | Zones: {len(zones)}", flush=True)
+                print(f"  Cube colors: {dict(Counter(d.color for d in dets))}", flush=True)
+                for color, zone in zones.items():
+                    print(f"  ZONE {color}: {np.round(zone.position[:2], 4)}", flush=True)
+                for d in dets[:15]:
+                    print(f"  CUBE {d.color}: {np.round(d.position[:2], 4)}", flush=True)
+
+
             pending = []
             for d in dets:
                 if d.color not in zones:
@@ -182,6 +182,43 @@ def run_interactive_viewer(env, pnp, sol_q):
                 key = (d.color, round(float(d.position[0]), 2), round(float(d.position[1]), 2))
                 if key not in failed_keys:
                     pending.append((d, z_xy, key))
+
+            # Throttled diagnostics when no cube is eligible for sorting.
+            if not pending and time.time() - last_diag_time >= 2.0:
+                last_diag_time = time.time()
+                print("[Detection diagnostic] No eligible cubes.", flush=True)
+
+                for color, zone in zones.items():
+                    print(
+                        f"  ZONE {color}: xy={np.round(zone.position[:2], 3)} "
+                        f"area={zone.area_px:.0f}",
+                        flush=True,
+                    )
+
+                for d in dets:
+                    key = (
+                        d.color,
+                        round(float(d.position[0]), 2),
+                        round(float(d.position[1]), 2),
+                    )
+                    if d.color not in zones:
+                        reason = "NO matching color zone"
+                    else:
+                        distance = float(np.linalg.norm(
+                            d.position[:2] - zones[d.color].position[:2]
+                        ))
+                        if distance < 0.062:
+                            reason = f"INSIDE pad ({distance:.3f} m)"
+                        elif key in failed_keys:
+                            reason = f"PREVIOUSLY FAILED ({distance:.3f} m)"
+                        else:
+                            reason = f"ELIGIBLE ({distance:.3f} m)"
+
+                    print(
+                        f"  CUBE {d.color}: xy={np.round(d.position[:2], 3)} "
+                        f"area={d.area_px:.0f} -> {reason}",
+                        flush=True,
+                    )
 
             if pending:
                 pending.sort(key=lambda item: np.linalg.norm(item[0].position[:2] - item[1]))
@@ -201,13 +238,13 @@ def run_interactive_viewer(env, pnp, sol_q):
                 else:
                     print(f"[Sort] Skipping {det_cube.color.upper()} cube ({res.stage}: {res.detail})")
                     failed_keys.add(key)
-                try:
-                    pnp.go_observe()
-                except Exception:
-                    pass
+            elif pending:
+                state["status"] = "Sorting automatically. Waiting for the next cube..."
+                env.settle(0.02)
+                time.sleep(0.01)
             else:
                 if not state["status"].startswith("Table cleared"):
-                    state["status"] = "All reachable cubes sorted! Click 'Generate Random Cubes' for a new batch."
+                    state["status"] = "No eligible cubes detected. Check the table or generate new cubes."
                 env.settle(0.02)
                 time.sleep(0.01)
     finally:
@@ -220,11 +257,41 @@ def run_sim(n_episodes, viewer, seed, margin=0.0025):
     from deployment.simulation_interface import SimulationInterface
     chain = build_chain()
     env = SimEnvironment(ROOT / "simulation/scene.xml", ROBOT, WORKSPACE, CAMERA, chain, seed, plan_margin=margin)
+
+    viewer_runtime = None
+    if viewer:
+        import mujoco.viewer
+
+        viewer_state = {
+            "regenerate": True,
+            "clear": False,
+            "status": "Initializing...",
+        }
+        viewer_robot_ref = {"robot": None}
+
+        def key_callback(keycode):
+            robot = viewer_robot_ref["robot"]
+            if keycode == ord("R"):
+                viewer_state["regenerate"] = True
+                if robot is not None:
+                    robot.abort_requested = True
+            elif keycode == ord("C"):
+                viewer_state["clear"] = True
+                if robot is not None:
+                    robot.abort_requested = True
+
+        early_viewer = mujoco.viewer.launch_passive(
+            env.model, env.data, key_callback=key_callback
+        )
+        early_viewer.sync()
+        viewer_runtime = (early_viewer, viewer_state, viewer_robot_ref)
+
     ik = IKSolver(chain)
     ik.is_valid = env.config_collision_free
     q_seed = (chain.lower + chain.upper) / 2
     sol = ik.solve(make_T(Rx(np.pi), WORKSPACE.observe_xyz), q_seed)
     assert sol is not None, "observe pose unreachable - edit WORKSPACE.observe_xyz"
+    # Keep J4-J6 fixed at the calibrated observation-pose angles.
 
     # Validate physical TCP approach/descent for cube picks and pad placements.
     # A multi-start solver prevents one poor seed from rejecting a reachable XY.
@@ -257,30 +324,135 @@ def run_sim(n_episodes, viewer, seed, margin=0.0025):
         return False
 
     env.validator_fn = can_reach_xy
-    import time
-
-    print("[6/6] Starting environment reset...", flush=True)
-    t0 = time.perf_counter()
-
-    env.reset(sol.q)
-
-    print(
-        f"[6/6] Environment reset completed in {time.perf_counter() - t0:.2f}s",
-        flush=True
-    )
-    ok_obs = env.config_collision_free(sol.q)
-    print('clearance margin %.1f mm; observe pose passes the check: %s' % (margin * 1000, ok_obs))
-    if not ok_obs:
-        raise SystemExit('Lower the margin (--margin 0.0015).')
-
     robot = SimulationInterface(env, None)
+    if viewer_runtime is not None:
+        viewer_runtime[2]["robot"] = robot
+
     pnp = build_controller(robot, SimCamera(env), chain)
     pnp.q_observe = sol.q
     pnp.ik.is_valid = env.config_collision_free
     pnp.safety.collision_fn = env.config_collision_free
 
+    # Target-aware collision checking for individual cube grasping.
+    pnp.target_body_fn = env.cube_body_for_position
+    pnp.target_collision_fn = env.config_collision_free_for_target
+    # Validate every cube against the complete proposed layout.
+    def validate_complete_layout(points, yaws):
+        from types import SimpleNamespace
+        import mujoco
+        from control.trajectory_planning import PlanningError
+
+        points = np.asarray(points, dtype=float)
+        yaws = np.asarray(yaws, dtype=float)
+        if len(points) != len(yaws):
+            raise ValueError('Layout positions and yaws must have equal length.')
+        saved_qpos = env.data.qpos.copy()
+        saved_qvel = env.data.qvel.copy()
+        saved_ctrl = env.data.ctrl.copy()
+        original_plan_place = pnp._plan_place
+
+        cube_z = WORKSPACE.table_z + WORKSPACE.cube_size / 2 + 0.002
+        zone_target = np.array([0.410, -0.1875])
+        started = time.perf_counter()
+
+        try:
+            env.clear_cubes()
+
+            for i, ((x, y), yaw) in enumerate(zip(points, yaws)):
+                adr = env.cube_adr[i]
+                env.data.qpos[adr:adr + 7] = [
+                    x, y, cube_z,
+                    np.cos(yaw / 2), 0.0, 0.0, np.sin(yaw / 2)
+                ]
+
+                dof = env.model.joint(
+                    f"{env.cubes[i]}_free"
+                ).dofadr[0]
+                env.data.qvel[dof:dof + 6] = 0.0
+
+            mujoco.mj_forward(env.model, env.data)
+
+            if viewer_runtime is not None:
+                viewer_runtime[0].sync()
+
+            # Validate picks only; placement is outside this check.
+            pnp._plan_place = lambda target_xy, q_start, **kwargs: (None, None, None)
+
+            for i, point in enumerate(points):
+                for j, adr in enumerate(env.jadr):
+                    env.data.qpos[adr] = sol.q[j]
+
+                for joint_name in chain.names:
+                    dof = env.model.joint(joint_name).dofadr[0]
+                    env.data.qvel[dof] = 0.0
+
+                mujoco.mj_forward(env.model, env.data)
+
+                det = SimpleNamespace(
+                    position=np.array([
+                        point[0],
+                        point[1],
+                        WORKSPACE.table_z + WORKSPACE.cube_size / 2,
+                    ]),
+                    yaw=float(yaws[i]),
+                )
+
+                cube_started = time.perf_counter()
+                try:
+                    pnp._plan_pick(det, zone_target)
+                    print(
+                        f"[Layout validator] Cube {i + 1}/{len(points)}: PASS "
+                        f"({time.perf_counter() - cube_started:.2f}s)",
+                        flush=True,
+                    )
+                except PlanningError as exc:
+                    print(
+                        f"[Layout validator] Cube {i + 1}/{len(points)}: "
+                        f"FAIL â€” {exc}",
+                        flush=True,
+                    )
+                    return False
+
+            return True
+
+        finally:
+            pnp._plan_place = original_plan_place
+            env.data.qpos[:] = saved_qpos
+            env.data.qvel[:] = saved_qvel
+            env.data.ctrl[:] = saved_ctrl
+            mujoco.mj_forward(env.model, env.data)
+
+            if viewer_runtime is not None:
+                viewer_runtime[0].sync()
+
+            print(
+                f"[Layout validator] Checked {len(points)} cubes in "
+                f"{time.perf_counter() - started:.2f}s; simulation restored.",
+                flush=True,
+            )
+
+    env.layout_validator_fn = validate_complete_layout
+
+    import time
+
+    if not viewer:
+        print("[6/6] Starting environment reset...", flush=True)
+        t0 = time.perf_counter()
+
+        env.reset(sol.q)
+
+        print(
+            f"[6/6] Environment reset completed in {time.perf_counter() - t0:.2f}s",
+            flush=True
+        )
+    ok_obs = env.config_collision_free(sol.q)
+    print('clearance margin %.1f mm; observe pose passes the check: %s' % (margin * 1000, ok_obs))
+    if not ok_obs:
+        raise SystemExit('Lower the margin (--margin 0.0015).')
+
     if viewer:
-        run_interactive_viewer(env, pnp, sol.q)
+        early_viewer, viewer_state, _ = viewer_runtime
+        run_interactive_viewer(env, pnp, sol.q, early_viewer, viewer_state)
         return
 
     log = []
@@ -338,4 +510,8 @@ if __name__ == "__main__":
     ap.add_argument("--ip", default="192.168.5.1")
     a = ap.parse_args()
     run_sim(a.episodes, a.viewer, a.seed, a.margin) if a.mode == "sim" else run_real(a.ip, 0.1)
+
+
+
+
 

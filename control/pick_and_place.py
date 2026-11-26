@@ -1,4 +1,4 @@
-﻿"""High-level autonomous pick-and-place with spaced 2x2 sub-slots per colored floor pad."""
+"""High-level autonomous pick-and-place with spaced 2x2 sub-slots per colored floor pad."""
 from dataclasses import dataclass
 import numpy as np
 from control.trajectory_planning import plan_joint, plan_cartesian_line, plan_joint_rrt, PlanningError
@@ -38,10 +38,46 @@ class PickAndPlace:
 
     def _run(self, traj, stage, allow_low=False):
         self.robot.stage = stage
+
+        # Temporary diagnostics: measure commanded joint movement without changing it.
+        q_actual = np.asarray(self.robot.get_joint_positions(), dtype=float)
+        q_path = np.asarray(traj.q, dtype=float)
+        if q_path.ndim == 2 and len(q_path) > 0:
+            full_path = np.vstack((q_actual, q_path))
+            increments = np.diff(full_path, axis=0)
+            net_deg = np.degrees(q_path[-1] - q_actual)
+            total_deg = np.degrees(np.sum(np.abs(increments), axis=0))
+            max_step_deg = np.degrees(np.max(np.abs(increments), axis=0))
+            fmt = lambda values: np.array2string(values, precision=1, suppress_small=True)
+            print(
+                f"[MOTION DIAG] {stage} | net={fmt(net_deg)} deg | "
+                f"path_total={fmt(total_deg)} deg | max_step={fmt(max_step_deg)} deg",
+                flush=True,
+            )
+
         self._validate(traj, stage, allow_low)
         if not self.robot.execute_trajectory(traj):
             raise PlanningError(stage, "robot reported error: " + str(self.robot.get_errors()))
 
+    def _plan_movement_cost(self, plan, q_start):
+        """Measure complete planned joint movement, including segment transitions."""
+        stages = ("app", "des", "lift", "tr", "pd", "rt")
+        if any(plan.get(stage) is None for stage in stages):
+            return None
+
+        total = np.zeros(6, dtype=float)
+        previous = np.asarray(q_start, dtype=float)
+
+        for stage in stages:
+            q = np.asarray(plan[stage].q, dtype=float)
+            if q.ndim != 2 or len(q) == 0:
+                return None
+
+            full_path = np.vstack((previous, q))
+            total += np.sum(np.abs(np.diff(full_path, axis=0)), axis=0)
+            previous = q[-1]
+
+        return np.degrees(total)
     def _holding(self):
         w = self.robot.get_gripper_width()
         return self.grip.min_grasp_width <= w <= self.grip.max_grasp_width
@@ -50,24 +86,69 @@ class PickAndPlace:
         return plan_cartesian_line(self.ik, T0, T1, q_seed, self.vmax, self.amax)
 
     def _joint_path(self, q0, q1, stage):
+        delta_deg = np.degrees(q1 - q0)
+        print(
+            f"[PATH DIAG] {stage} | start={np.round(np.degrees(q0), 1)} deg | "
+            f"end={np.round(np.degrees(q1), 1)} deg | delta={np.round(delta_deg, 1)} deg",
+            flush=True,
+        )
         direct = plan_joint(q0, q1, self.vmax, self.amax)
         try:
             self._validate(direct, stage)
+            print(f"[PATH DIAG] {stage} | planner=DIRECT", flush=True)
             return direct
-        except PlanningError:
-            pass
-        tr = plan_joint_rrt(q0, q1, self.safety.config_ok, self.chain.lower, self.chain.upper,
-                            self.vmax, self.amax)
+        except PlanningError as exc:
+            print(f"[PATH DIAG] {stage} | DIRECT rejected: {exc}; trying RRT", flush=True)
+        rrt_lower = self.chain.lower.copy()
+        rrt_upper = self.chain.upper.copy()
+
+        if getattr(self.ik, "position_only", False):
+            fixed = self.ik.fixed_q
+            active = self.ik.active_dofs
+            rrt_lower[active:] = fixed[active:]
+            rrt_upper[active:] = fixed[active:]
+
+        tr = plan_joint_rrt(
+            q0, q1, self.safety.config_ok,
+            rrt_lower, rrt_upper,
+            self.vmax, self.amax,
+        )
         self._validate(tr, stage)
+        print(f"[PATH DIAG] {stage} | planner=RRT | waypoints={len(tr.q)}", flush=True)
         return tr
+
+    def _nearest_equivalent(self, q, q_ref):
+        q = np.asarray(q, dtype=float).copy()
+        q_ref = np.asarray(q_ref, dtype=float)
+        two_pi = 2.0 * np.pi
+
+        for i, joint in enumerate(self.chain.actuated):
+            if joint.type not in ("revolute", "continuous"):
+                continue
+
+            lo = float(self.chain.lower[i])
+            hi = float(self.chain.upper[i])
+            base = float(q[i])
+
+            k_min = int(np.ceil((lo - base) / two_pi - 1e-10))
+            k_max = int(np.floor((hi - base) / two_pi + 1e-10))
+
+            if k_min <= k_max:
+                equivalents = (
+                    base + two_pi * k
+                    for k in range(k_min, k_max + 1)
+                )
+                q[i] = min(equivalents, key=lambda value: abs(value - q_ref[i]))
+
+        return q
 
     def compute_observe_pose(self, q_seed):
         x, y, z = self.ws.observe_xyz
         sol = self.ik.solve(make_T(Rx(np.pi), [x, y, z]), q_seed)
         if sol is None:
             raise PlanningError("observe", "observe pose unreachable; edit WORKSPACE.observe_xyz")
-        self.q_observe = sol.q
-        return sol.q
+        self.q_observe = self._nearest_equivalent(sol.q, q_seed)
+        return self.q_observe
 
     def go_observe(self):
         q0 = self.robot.get_joint_positions()
@@ -83,24 +164,50 @@ class PickAndPlace:
 
     def _ik_candidates(self, T, q_ref):
         ok = self.ik.is_valid or (lambda q: True)
-        seen = []
-        fast = self.ik.solve_from(T, q_ref)
-        if fast.converged and fast.sigma_min >= self.ik.sigma_thresh and ok(fast.q):
-            seen.append(fast.q)
-            yield fast.q
-        for s in self.ik.solve_all(T, q_ref):
-            if ok(s.q) and all(np.max(np.abs(s.q - o)) > 1e-2 for o in seen):
-                seen.append(s.q)
-                yield s.q
+        yielded = []
 
-    def _plan_place(self, target_xy, q_start):
+        # Try the seed-near solution first.
+        fast = self.ik.solve_from(T, q_ref)
+        if fast.converged and fast.sigma_min >= self.ik.sigma_thresh:
+            q = self._nearest_equivalent(fast.q, q_ref)
+            if ok(q):
+                yielded.append(q)
+                yield q
+
+        # Defer multi-start IK until another candidate is requested.
+        candidates = []
+        for sol in self.ik.solve_all(T, q_ref):
+            q = self._nearest_equivalent(sol.q, q_ref)
+            if not ok(q):
+                continue
+            if any(np.max(np.abs(q - existing)) <= 1e-2
+                   for existing in yielded + candidates):
+                continue
+            candidates.append(q)
+
+        candidates.sort(key=lambda q: np.linalg.norm(q - q_ref))
+        for q in candidates:
+            yield q
+
+    def _plan_place(self, target_xy, q_start, yaw=0.0):
         Tp = offset_z(
-            place_pose(target_xy, self.ws.table_z, self.ws.cube_size, yaw=0.0),
+            place_pose(target_xy, self.ws.table_z, self.ws.cube_size, yaw=yaw),
             self.ws.tcp_to_cube_center_z + 0.002,
         )
         Tpa = offset_z(Tp, self.ws.approach_height)
         why = "no IK solution for the place pose"
-        for k, qpa in enumerate(self._ik_candidates(Tpa, q_start)):
+        place_candidates = list(self._ik_candidates(Tpa, q_start))
+        for index, candidate in enumerate(place_candidates[:6]):
+            delta = np.degrees(candidate - q_start)
+            print(
+                f"[PLACE IK DIAG] candidate={index} "
+                f"delta={np.round(delta, 1)} deg "
+                f"distance={np.linalg.norm(delta):.1f} deg",
+                flush=True,
+            )
+        selected_plan = None
+        selected_cost = np.inf
+        for k, qpa in enumerate(place_candidates):
             if k >= self.max_candidates:
                 break
             try:
@@ -109,12 +216,86 @@ class PickAndPlace:
                 self._validate(t_pd, "place_descend", True)
                 t_rt = self._line(Tp, Tpa, t_pd.q[-1])
                 self._validate(t_rt, "retreat", True)
-                return t_tr, t_pd, t_rt
+
+                paths = (
+                    ("transport", np.vstack((np.asarray(q_start, dtype=float), t_tr.q))),
+                    ("descend", np.vstack((t_tr.q[-1], t_pd.q))),
+                    ("retreat", np.vstack((t_pd.q[-1], t_rt.q))),
+                )
+                costs = {}
+                for name, path in paths:
+                    costs[name] = np.degrees(
+                        np.sum(np.abs(np.diff(path, axis=0)), axis=0)
+                    )
+
+                total_cost = sum(costs.values())
+                print(
+                    f"[PLACE FEASIBILITY] candidate={k} "
+                    f"transport={costs['transport'].sum():.1f} deg "
+                    f"descend={costs['descend'].sum():.1f} deg "
+                    f"retreat={costs['retreat'].sum():.1f} deg "
+                    f"total={total_cost.sum():.1f} deg "
+                    f"joints={np.round(total_cost, 1)}",
+                    flush=True,
+                )
+
+                candidate_cost = float(total_cost.sum())
+                if candidate_cost < selected_cost:
+                    selected_cost = candidate_cost
+                    selected_plan = (t_tr, t_pd, t_rt)
+
             except PlanningError as e:
                 why = str(e)
+                print(
+                    f"[PLACE FEASIBILITY] candidate={k} REJECTED: {why}",
+                    flush=True,
+                )
+
+        if selected_plan is not None:
+            return selected_plan
         raise PlanningError("place_plan", why)
 
     def _plan_pick(self, det, target_xy):
+        target_body_fn = getattr(self, "target_body_fn", None)
+        target_collision_fn = getattr(self, "target_collision_fn", None)
+
+        # Real-robot controllers have no MuJoCo target callbacks.
+        if not callable(target_body_fn) or not callable(target_collision_fn):
+            return self._plan_pick_impl(det, target_xy)
+
+        try:
+            target_body = target_body_fn(det.position)
+        except ValueError as exc:
+            raise PlanningError("target_identification", str(exc)) from exc
+
+        original_ik_valid = self.ik.is_valid
+        original_collision_fn = self.safety.collision_fn
+
+        target_check = lambda q: target_collision_fn(q, target_body)
+
+        try:
+            self.ik.is_valid = target_check
+            self.safety.collision_fn = target_check
+
+            return self._plan_pick_impl(
+                det,
+                target_xy,
+                original_ik_valid,
+                original_collision_fn,
+                target_check,
+            )
+        finally:
+            self.ik.is_valid = original_ik_valid
+            self.safety.collision_fn = original_collision_fn
+
+    def _plan_pick_impl(
+        self,
+        det,
+        target_xy,
+        original_ik_valid=None,
+        original_collision_fn=None,
+        target_check=None,
+    ):
         q_now = self.robot.get_joint_positions()
         why, tried, fails = "no collision-free IK solution for any grasp orientation", 0, {}
         # Detection reports the cube centre; IK targets the physical AG95 TCP.
@@ -139,7 +320,21 @@ class PickAndPlace:
                     self._validate(t_des, "descend", True)
                     t_lift = self._line(Tg, Tl, t_des.q[-1])
                     self._validate(t_lift, "lift", True)
-                    t_tr, t_pd, t_rt = self._plan_place(target_xy, t_lift.q[-1])
+                    # Placement planning uses the ordinary collision checker.
+                    if target_check is not None:
+                        self.ik.is_valid = original_ik_valid
+                        self.safety.collision_fn = original_collision_fn
+
+                    try:
+                        grasp_yaw = float(np.arctan2(Tg[1, 0], Tg[0, 0]))
+                        t_tr, t_pd, t_rt = self._plan_place(
+                            target_xy, t_lift.q[-1], yaw=grasp_yaw
+                        )
+                    finally:
+                        # Restore target-aware checking for the remaining pick planning.
+                        if target_check is not None:
+                            self.ik.is_valid = target_check
+                            self.safety.collision_fn = target_check
                     t_back = self._line(Tg, Ta, t_des.q[-1])
                     print(
                         f"[GRASP ORIENTATION] candidate={candidate_index} "
@@ -147,7 +342,16 @@ class PickAndPlace:
                         f"detected_yaw={np.degrees(det.yaw):.2f} deg",
                         flush=True,
                     )
-                    return dict(app=t_app, des=t_des, lift=t_lift, tr=t_tr, pd=t_pd, rt=t_rt, back=t_back)
+                    plan = dict(app=t_app, des=t_des, lift=t_lift, tr=t_tr, pd=t_pd, rt=t_rt, back=t_back)
+                    movement = self._plan_movement_cost(plan, q_now)
+                    if movement is not None:
+                        fmt = lambda values: np.array2string(values, precision=1, suppress_small=True)
+                        print(
+                            f"[PLAN COST] joints={fmt(movement)} deg | "
+                            f"total={movement.sum():.1f} deg",
+                            flush=True,
+                        )
+                    return plan
                 except PlanningError as e:
                     why = str(e)
                     fails[e.stage] = fails.get(e.stage, 0) + 1
@@ -165,37 +369,90 @@ class PickAndPlace:
         except PlanningError as e:
             return PickResult(False, e.stage, str(e), det.position, det.color)
 
+        # Keep target-aware collision checking active during physical picking.
+        target_body_fn = getattr(self, "target_body_fn", None)
+        target_collision_fn = getattr(self, "target_collision_fn", None)
+
+        original_ik_valid = self.ik.is_valid
+        original_collision_fn = self.safety.collision_fn
+        target_check = None
+
+        if callable(target_body_fn) and callable(target_collision_fn):
+            try:
+                target_body = target_body_fn(det.position)
+            except ValueError as exc:
+                return PickResult(
+                    False, "target_identification", str(exc),
+                    det.position, det.color
+                )
+
+            target_check = lambda q: target_collision_fn(q, target_body)
+            self.ik.is_valid = target_check
+            self.safety.collision_fn = target_check
+
         stage = "approach"
         try:
             self.robot.set_gripper(self.grip.open_width)
             self._run(plan["app"], stage)
+
             stage = "descend"
             self._run(plan["des"], stage, True)
+
             stage = "grasp"
             self.robot.set_gripper(self.grip.close_width)
             w = self.robot.get_gripper_width()
+
             if not (self.grip.min_grasp_width <= w <= self.grip.max_grasp_width):
                 self.robot.set_gripper(self.grip.open_width)
                 self._run(plan["back"], "retreat_after_miss", True)
-                return PickResult(False, "grasp", f"gripper width {w*1000:.1f} mm (miss)", det.position, det.color)
+                return PickResult(
+                    False, "grasp",
+                    f"gripper width {w*1000:.1f} mm (miss)",
+                    det.position, det.color
+                )
+
             stage = "lift"
             self._run(plan["lift"], stage, True)
+
             if not self._holding():
-                return PickResult(False, "lift", "cube lost during lift", det.position, det.color)
+                return PickResult(
+                    False, "lift", "cube lost during lift",
+                    det.position, det.color
+                )
+
+            # The target cube is now held. Use ordinary collision checking
+            # for transport and placement.
+            if target_check is not None:
+                self.ik.is_valid = original_ik_valid
+                self.safety.collision_fn = original_collision_fn
+
             stage = "transport"
             self._run(plan["tr"], stage)
+
             if not self._holding():
-                return PickResult(False, "transport", "cube dropped during transport", det.position, det.color)
+                return PickResult(
+                    False, "transport", "cube dropped during transport",
+                    det.position, det.color
+                )
+
             stage = "place_descend"
             self._run(plan["pd"], stage, True)
+
             stage = "release"
             self.robot.set_gripper(self.grip.open_width)
+
             stage = "retreat"
             self._run(plan["rt"], stage, True)
+
             return PickResult(True, "done", "", det.position, det.color)
+
         except PlanningError as e:
             self.robot.stop()
             return PickResult(False, e.stage, str(e), det.position, det.color)
+
+        finally:
+            self.ik.is_valid = original_ik_valid
+            self.safety.collision_fn = original_collision_fn
 
     def run(self):
         """Detect cubes and matching floor zones -> place each cube onto a spaced sub-slot of its same-colored zone."""
@@ -222,3 +479,4 @@ class PickAndPlace:
         except PlanningError:
             pass
         return dets, results
+

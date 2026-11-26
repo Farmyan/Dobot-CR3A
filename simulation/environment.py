@@ -1,4 +1,4 @@
-﻿"""MuJoCo environment: random per-color cube counts + random colored floor zones."""
+"""MuJoCo environment: random per-color cube counts + random colored floor zones."""
 import numpy as np
 import mujoco
 from config import CUBE_COLORS
@@ -115,6 +115,7 @@ class SimEnvironment:
         self.unsafe_pairs = {}
         self.phase = ""
         self.validator_fn = None   # optional callable(xy) -> bool to verify IK reachability
+        self.layout_validator_fn = None  # optional callable(points) -> bool
         self._reachability_cache = {}
         self.sample_attempts = 160
         self.last_spawn_counts = {}
@@ -164,23 +165,22 @@ class SimEnvironment:
         self._cm.geom_rgba[self.cube_geoms[idx]] = rgba
 
     def randomize_zones(self, active_colors):
-        """Place active zones using individually validated positions."""
-        zone_map = {}
-        selected = []
+        """Place active classifier zones at their permanent positions."""
+        fixed = {
+            "red": (0.410, -0.1875),
+            "yellow": (0.410, -0.0625),
+            "green": (0.410, 0.0625),
+            "blue": (0.410, 0.1875),
+        }
 
-        for color_name in active_colors:
-            point = self._sample_xy(
-                selected,
-                [self.ws.min_zone_spacing] * len(selected),
-                max_attempts=self.sample_attempts,
-                purpose="place",
-            )
-            if point is None:
-                raise RuntimeError(
-                    f"[Spawner] Could not find a reachable position for zone {color_name}."
-                )
-            selected.append(point)
-            zone_map[color_name] = point
+        unknown = set(active_colors) - set(fixed)
+        if unknown:
+            raise ValueError(f"Unknown classifier colors: {sorted(unknown)}")
+
+        zone_map = {
+            color: np.asarray(fixed[color], dtype=float)
+            for color in active_colors
+        }
 
         for color_name, mid in zip(self.zone_color_names, self.zone_mocap):
             if color_name in zone_map:
@@ -228,25 +228,24 @@ class SimEnvironment:
 
         self.clear_cubes()
 
-        print("[Spawner] Finding four reachable zone positions...", flush=True)
+        print("[Spawner] Using four fixed classifier-zone positions...", flush=True)
 
-        zone_points = []
-        for color_name in palette:
-            point = self._sample_xy(
-                zone_points,
-                [self.ws.min_zone_spacing] * len(zone_points),
-                max_attempts=self.sample_attempts,
-                purpose="place",
-            )
-            if point is None:
-                raise RuntimeError(
-                    f"[Spawner] Could not place zone {color_name} after "
-                    f"{self.sample_attempts} candidate attempts."
-                )
-            zone_points.append(point)
+        fixed_zones = {
+            "red": (0.410, -0.1875),
+            "yellow": (0.410, -0.0625),
+            "green": (0.410, 0.0625),
+            "blue": (0.410, 0.1875),
+        }
+        zone_map = {
+            color: np.asarray(fixed_zones[color], dtype=float)
+            for color in palette
+        }
+        zone_points = [zone_map[color] for color in palette]
+
+        for color_name, point in zip(palette, zone_points):
             print(
                 f"[Spawner] Zone {color_name}: "
-                f"({point[0]:.3f}, {point[1]:.3f})",
+                f"({point[0]:.3f}, {point[1]:.4f})",
                 flush=True,
             )
 
@@ -310,6 +309,9 @@ class SimEnvironment:
             if len(selected) != 15:
                 continue
 
+            # Generate orientations now so validation and spawning use the same yaw.
+            selected_yaws = self.rng.uniform(-np.pi, np.pi, size=len(selected))
+
             print(
                 f"[Spawner] Validating randomized layout "
                 f"{layout_try}/{max_layout_attempts}...",
@@ -329,6 +331,16 @@ class SimEnvironment:
                     )
                     break
 
+            if layout_ok and self.layout_validator_fn is not None:
+                print("[Spawner] Checking neighbor-aware graspability...", flush=True)
+                try:
+                    layout_ok = bool(self.layout_validator_fn(np.asarray(selected, dtype=float), selected_yaws))
+                except Exception as exc:
+                    layout_ok = False
+                    print(f"[Spawner] Complete-layout validation error: {exc}", flush=True)
+                if not layout_ok:
+                    print("[Spawner] Layout rejected by neighbor-aware validation.", flush=True)
+
             if layout_ok:
                 cube_points = selected
                 break
@@ -347,13 +359,9 @@ class SimEnvironment:
         )
 
         # Commit the complete layout only after all 19 positions pass validation.
-        zone_map = {}
-        zone_iter = iter(zone_points)
-
         for color_name, mid in zip(self.zone_color_names, self.zone_mocap):
-            if color_name in palette:
-                point = next(zone_iter)
-                zone_map[color_name] = point
+            if color_name in zone_map:
+                point = zone_map[color_name]
                 self.data.mocap_pos[mid] = [point[0], point[1], 0.0006]
                 self.data.mocap_quat[mid] = [1.0, 0.0, 0.0, 0.0]
             else:
@@ -368,7 +376,7 @@ class SimEnvironment:
                 point = cube_points[idx]
                 self._set_cube_color(idx, color_name)
 
-                yaw = float(self.rng.uniform(-np.pi, np.pi))
+                yaw = float(selected_yaws[idx])
                 adr = self.cube_adr[idx]
                 d.qpos[adr:adr + 7] = [
                     point[0],
@@ -454,7 +462,38 @@ class SimEnvironment:
         key = f"[{self.phase}] {kind}: {g(c.geom1)} <-> {g(c.geom2)}"
         self.unsafe_pairs[key] = self.unsafe_pairs.get(key, 0) + 1
 
-    def config_collision_free(self, q):
+    def cube_body_for_position(self, position, max_distance=0.04, ambiguity_margin=0.005):
+        """Match a detected XY position to one unambiguous MuJoCo cube body."""
+        xy = np.asarray(position, dtype=float).reshape(-1)[:2]
+        if xy.size != 2 or not np.all(np.isfinite(xy)):
+            raise ValueError("Invalid detected cube position")
+
+        positions = np.asarray([
+            self.data.qpos[adr:adr + 2] for adr in self.cube_adr
+        ], dtype=float)
+
+        distances = np.linalg.norm(positions - xy, axis=1)
+        order = np.argsort(distances)
+        nearest = int(order[0])
+
+        if distances[nearest] > max_distance:
+            raise ValueError(
+                f"No MuJoCo cube matches detection: nearest distance "
+                f"{distances[nearest] * 1000:.1f} mm"
+            )
+
+        if len(order) > 1:
+            second = int(order[1])
+            if distances[second] - distances[nearest] < ambiguity_margin:
+                raise ValueError("Ambiguous MuJoCo cube match")
+
+        return int(self.cube_bodies[nearest])
+
+    def config_collision_free_for_target(self, q, target_cube_body):
+        """Check a configuration, allowing gripper contact with one target cube only."""
+        return self.config_collision_free(q, target_cube_body=target_cube_body)
+
+    def config_collision_free(self, q, target_cube_body=None):
         s, m = self._scratch, self._cm
         s.qpos[:] = self.data.qpos
         for a, v in zip(self.jadr, q):
@@ -468,8 +507,17 @@ class SimEnvironment:
                 continue
             g1, g2 = b1 in self.gripper_bodies, b2 in self.gripper_bodies
             if b1 in self.cube_bodies or b2 in self.cube_bodies:
-                if g1 or g2 or b1 in self._held_cubes() or b2 in self._held_cubes():
-                    continue
+                cube_body = b1 if b1 in self.cube_bodies else b2
+                if target_cube_body is None:
+                    if g1 or g2 or b1 in self._held_cubes() or b2 in self._held_cubes():
+                        continue
+                else:
+                    target_contact = (
+                        (g1 and b2 == target_cube_body)
+                        or (g2 and b1 == target_cube_body)
+                    )
+                    if target_contact:
+                        continue
                 return False
             if g1 and g2:
                 continue
@@ -571,3 +619,6 @@ class SimCamera(Camera):
         T_world_cam_mj = make_T(e.data.cam_xmat[e.cam_id].reshape(3, 3), e.data.cam_xpos[e.cam_id])
         flip = np.diag([1.0, -1.0, -1.0, 1.0])
         return inv_T(e.T_world_base()) @ T_world_cam_mj @ flip
+
+
+

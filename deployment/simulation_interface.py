@@ -1,4 +1,4 @@
-"""RobotInterface implementation backed by MuJoCo (keeps UI responsive during trajectories)."""
+﻿"""RobotInterface implementation backed by MuJoCo (keeps UI responsive during trajectories)."""
 import numpy as np
 from deployment.robot_interface import RobotInterface
 
@@ -21,27 +21,52 @@ class SimulationInterface(RobotInterface):
 
     def execute_trajectory(self, traj):
         self.env.phase = getattr(self, "stage", "")
+        self.max_track_err = 0.0
         qd = np.gradient(traj.q, traj.dt, axis=0)
+
         for step_i, (q, v) in enumerate(zip(traj.q, qd)):
             if self.abort_requested:
                 self.stop()
                 return False
+
             self.env.step_to(q + self.lead * v, traj.dt)
-            self.max_track_err = max(self.max_track_err, float(np.abs(self.env.joint_positions() - q).max()))
+            err = float(np.abs(self.env.joint_positions() - q).max())
+            self.max_track_err = max(self.max_track_err, err)
+
             if step_i % 2 == 0:
                 self._pump()
-        self._settle(traj.q[-1])
+
+        final_err = self._settle(traj.q[-1])
+        print(
+            f"[TRACK DIAG] stage={self.stage} "
+            f"max_error={np.degrees(self.max_track_err):.3f} deg "
+            f"final_error={np.degrees(final_err):.3f} deg",
+            flush=True,
+        )
         return True
 
     def _settle(self, q_target, tol=2e-3, max_s=2.0):
         self.env.step_to(q_target, 0.1)
         t = 0.0
-        while t < max_s and np.abs(self.env.joint_positions() - q_target).max() > tol:
+        err = float(np.abs(self.env.joint_positions() - q_target).max())
+
+        while t < max_s and err > tol:
             if self.abort_requested:
-                return
+                break
             self.env.step_to(q_target, 0.05)
             self._pump()
             t += 0.05
+            err = float(np.abs(self.env.joint_positions() - q_target).max())
+
+        status = "OK" if err <= tol else "TIMEOUT"
+        print(
+            f"[SETTLE DIAG] status={status} "
+            f"error={np.degrees(err):.3f} deg "
+            f"tolerance={np.degrees(tol):.3f} deg "
+            f"wait={t:.2f}s",
+            flush=True,
+        )
+        return err
 
     def set_gripper(self, width, wait=True):
         # Match the validated AG95 position controller.
@@ -86,4 +111,5 @@ class SimulationInterface(RobotInterface):
 
     def stop(self):
         self.env.data.ctrl[self.env.arm_act] = self.env.joint_positions()
+
 
